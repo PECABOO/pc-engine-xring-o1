@@ -6,7 +6,7 @@ log(){ echo "[$(date '+%H:%M:%S')] $*" >> "$LOG"; }
 log "guard up pid=$$"
 while true; do
   if [ -f "$FLAG" ]; then
-    PIDS=$(ps -A -o PID,ARGS 2>/dev/null | awk '/[s]team\.exe|[s]teamwebhelper|[s]teamerrorreporter/{print $1}')
+    PIDS=$(/system/bin/ps -A -o PID,ARGS 2>/dev/null | /system/bin/awk '/[s]team\.exe|[s]teamwebhelper|[s]teamerrorreporter/{print $1}')
     if [ -n "$PIDS" ]; then
       for p in $PIDS; do kill -9 "$p" 2>/dev/null; done
       log "killed steam: $(echo $PIDS | tr '\n' ' ')"

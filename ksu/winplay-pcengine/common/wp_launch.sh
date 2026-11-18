@@ -16,7 +16,7 @@ ACT=com.xiaomi.winplay/com.xiaomi.winplay.WineActivity
 
 b64d() { echo "$1" | base64 -d 2>/dev/null; }
 # 这个 ROM 的 toybox pidof 对 PE 进程名匹配不可靠，统一用 ps 判活
-wt_running() { ps -A -o ARGS 2>/dev/null | grep -q "wintask[.]exe"; }
+wt_running() { /system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "wintask[.]exe"; }
 EXE=$(b64d "$1")
 # ---- 参数位次防左移 ----
 # 空字符串参数会被 shell/命令拼接吃掉，导致后面所有位置整体左移：
@@ -82,7 +82,7 @@ wr_cmd() {   # $1=exe  $2=args  $3=seq
     chmod 666 "$CMD" 2>/dev/null
 }
 
-wakefulness() { dumpsys power 2>/dev/null | grep -m1 -o 'mWakefulness=[A-Za-z]*' | cut -d= -f2; }
+wakefulness() { dumpsys power 2>/dev/null | /system/bin/grep -m1 -o 'mWakefulness=[A-Za-z]*' | cut -d= -f2; }
 
 echo "----- winplay-launcher ($(id -u)) -----"
 log "exe=[$EXE] args=[$ARGS] screenoff=$SCREENOFF steam=$STEAM"
@@ -104,7 +104,7 @@ chmod 777 "$WPZ" 2>/dev/null
 
 # 1. 亮屏 + 解锁（只有本来就是灭屏/锁屏时才滑动，避免在桌面误拉通知栏）
 WAKE=$(wakefulness)
-LOCK=$(dumpsys window 2>/dev/null | grep -m1 -o 'mDreamingLockscreen=[a-z]*' | cut -d= -f2)
+LOCK=$(dumpsys window 2>/dev/null | /system/bin/grep -m1 -o 'mDreamingLockscreen=[a-z]*' | cut -d= -f2)
 log "wakefulness=${WAKE:-?} dreamingLockscreen=${LOCK:-?}"
 
 NEED_UNLOCK=0
@@ -187,7 +187,7 @@ if [ -z "$PID" ]; then
     j=0
     while [ $j -lt 90 ]; do
         j=$((j + 1)); sleep 1
-        [ "$(ps -A -o ARGS 2>/dev/null | grep -c '[e]xplorer.exe /desktop')" -ge 1 ] && break
+        [ "$(/system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -c '[e]xplorer.exe /desktop')" -ge 1 ] && break
     done
     log "cold start: desktop ready after ${j}s"
     # 模块的 WindowChannel 在进程启动时就已加载；清一次 res2.log 便于后续按 seq 判读
@@ -198,7 +198,7 @@ fi
 log "wineserver=[$(pidof wineserver)]"
 
 # 3. 确保 WineActivity 在前台（后台/灭屏时 runNewApp 静默无效）
-case "$(dumpsys activity activities 2>/dev/null | grep -m1 -E 'topResumedActivity|mResumedActivity')" in
+case "$(dumpsys activity activities 2>/dev/null | /system/bin/grep -m1 -E 'topResumedActivity|mResumedActivity')" in
     *$PKG*) log "engine already foreground" ;;
     *)
         log "engine not foreground -> am start WineActivity"
@@ -206,7 +206,7 @@ case "$(dumpsys activity activities 2>/dev/null | grep -m1 -E 'topResumedActivit
         i=0
         while [ $i -lt 15 ]; do
             sleep 1
-            dumpsys activity activities 2>/dev/null | grep -qE "(topResumedActivity|mResumedActivity).*$PKG" && { log "foreground after $((i + 1))s"; break; }
+            dumpsys activity activities 2>/dev/null | /system/bin/grep -qE "(topResumedActivity|mResumedActivity).*$PKG" && { log "foreground after $((i + 1))s"; break; }
             i=$((i + 1))
         done
         ;;
@@ -232,7 +232,7 @@ if [ "$PANEL" != "1" ]; then
         else su -M -c 'killall -9 wintask.exe' 2>/dev/null; fi
         
 # 3.8) 窗口几何修正守护：把跑出屏幕的窗口拉回来（SumatraPDF 这类会记住过大尺寸）
-fx_running() { ps -A -o ARGS 2>/dev/null | grep -q "winfix[.]exe"; }
+fx_running() { /system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "winfix[.]exe"; }
 if [ -f "$PREFIX/drive_c/windows/winfix.exe" ] && ! fx_running; then
     printf '@echo off\r\nset MV_WATCH=1\r\nstart "" "C:\\windows\\winfix.exe"\r\nexit\r\n' \
         > "$PREFIX/drive_c/windows/_wpfix.bat" 2>/dev/null

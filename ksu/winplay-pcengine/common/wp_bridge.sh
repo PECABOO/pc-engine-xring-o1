@@ -37,7 +37,7 @@ trap 'rm -rf "$LOCK"' EXIT INT TERM HUP
 
 # 锁文件可能因强杀而残留：再做一次「最小 PID 胜出」的兜底判定
 # （toybox ps 的 ARGS 列可能截断，所以只按 PID 比较，不看命令行尾部）
-OLDER=$(ps -A -o PID,ARGS 2>/dev/null | awk -v me=$$ '/wp_bridge\.sh/ && $1+0 < me+0 {print $1; exit}')
+OLDER=$(/system/bin/ps -A -o PID,ARGS 2>/dev/null | /system/bin/awk -v me=$$ '/wp_bridge\.sh/ && $1+0 < me+0 {print $1; exit}')
 if [ -n "$OLDER" ]; then
     echo "[$(date)] bridge older instance pid=$OLDER exists, this one ($$) exits" >> /storage/emulated/0/wpz/bridge.log
     exit 0
@@ -47,7 +47,7 @@ fi
 # ---- no-Steam 守卫（flag 存在时把引擎自己拉起的 steam 杀掉）----
 NS=$(dirname "$0")/wp_nosteam.sh
 [ -f "$NS" ] || NS=/data/local/tmp/wp/wp_nosteam.sh
-if [ -f "$NS" ] && ! ps -A -o ARGS 2>/dev/null | grep -q "[w]p_nosteam.sh"; then
+if [ -f "$NS" ] && ! /system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "[w]p_nosteam.sh"; then
     nohup setsid sh "$NS" </dev/null >/dev/null 2>&1 &
     echo "[$(date)] nosteam guard started" >> /storage/emulated/0/wpz/bridge.log
 fi
@@ -83,7 +83,7 @@ while true; do
             IDIR=$(cut -d'|' -f2 "$IREQ")
             ISRC=$(cut -d'|' -f3 "$IREQ")
             echo "[$(date +%H:%M:%S)] install seq=$ISEQ dir=$IDIR src=$ISRC" >> "$WPZ/bridge.log"
-            ( while true; do date +%s > "$ALIVE" 2>/dev/null; sleep 1; done ) &
+            sh -c 'while :; do date +%s > "$0"; sleep 1; done' "$ALIVE" &
             _HB2=$!
             { echo "seq=$ISEQ"; sh "$INST" "$ISRC" "$IDIR" 2>&1; echo "rc=$?"; } > "$IRES.tmp" 2>&1
             kill $_HB2 2>/dev/null
@@ -101,7 +101,7 @@ while true; do
             ARG=$(cut -d'|' -f4 "$REQ")
             echo "[$(date +%H:%M:%S)] req seq=$SEQ" >> "$WPZ/bridge.log"
             # 跑脚本期间单线程循环会阻塞，起一个心跳子进程，避免 App 误判"网桥已死"
-            ( while true; do date +%s > "$ALIVE" 2>/dev/null; sleep 1; done ) &
+            sh -c 'while :; do date +%s > "$0"; sleep 1; done' "$ALIVE" &
             _HB=$!
             { echo "seq=$SEQ"; sh "$SELF" "$EXE" "$ARG" "$SO" 2>&1; echo "rc=$?"; } > "$RES.tmp" 2>&1
             kill $_HB 2>/dev/null

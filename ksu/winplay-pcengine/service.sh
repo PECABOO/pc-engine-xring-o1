@@ -66,17 +66,24 @@ start_nosteam() {
     log "nosteam guard started pid=$!"
 }
 
-ps -A -o ARGS 2>/dev/null | grep -q "[w]p_bridge.sh"  || start_bridge
-ps -A -o ARGS 2>/dev/null | grep -q "[w]p_nosteam.sh" || start_nosteam
+/system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "[w]p_bridge.sh"  || start_bridge
+/system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "[w]p_nosteam.sh" || start_nosteam
 
 # 6) 看门狗：网桥死了就重拉（每 30 s 一次，永不退出）
+bridge_alive() {
+    L=/data/local/tmp/.wp_bridge.lock
+    P=$(cat "$L/pid" 2>/dev/null)
+    [ -n "$P" ] && kill -0 "$P" 2>/dev/null
+}
+
 while true; do
     sleep 30
-    if ! ps -A -o ARGS 2>/dev/null | grep -q "[w]p_bridge.sh"; then
-        log "bridge gone, restarting"
+    if ! bridge_alive; then
+        log "bridge not alive (lock=$P), restarting"
+        rm -rf /data/local/tmp/.wp_bridge.lock
         start_bridge
     fi
-    if ! ps -A -o ARGS 2>/dev/null | grep -q "[w]p_nosteam.sh"; then
+    if ! /system/bin/ps -A -o ARGS 2>/dev/null | /system/bin/grep -q "[w]p_nosteam.sh"; then
         start_nosteam
     fi
 done
