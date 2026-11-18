@@ -26,3 +26,7 @@ scripts/fix-image-offload-null-guard.sh
 
 # 运行时产物
 *.pid
+
+# 构建产物（模块 zip、含 APK 的完整包）
+dist/
+ksu/winplay-pcengine/apks/

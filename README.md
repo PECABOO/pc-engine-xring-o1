@@ -1489,3 +1489,89 @@ if(same) return 1;   /* 自己的窗口一律不碰 */
 ```
 
 2. **桌面窗口被标成 `[min]`**：wine 里 `GetWindowPlacement` 对桌面窗口（标题 `C:\users\xiaomi\`）也返回 `showCmd=2`。原来的兜底是「矩形正常就不算最小化」，但桌面窗口的矩形确实异常。改成按标题判：标题以反斜杠结尾的视为桌面，不打 `[min]`。注意要在把标题拼进 `g_tmp` **之前**判断——第一版写成检查 `g_tmp` 的末字符，而那时 `g_tmp` 还只有 `"[W] "`，所以没生效。
+
+---
+
+## KernelSU 模块：刷进去就有一套能用的 PC 引擎
+
+`ksu/winplay-pcengine/` 是一个可直接刷入的 KernelSU 模块。目标只有一个：**同款机型 + 已 root，刷模块 + 给应用授权后，点图标就能跑 Windows 程序**，不需要 adb、不需要手动敲命令。
+
+### 前置条件
+
+| 项 | 要求 |
+|---|---|
+| 设备 | 同款机型（`25032RP42C` / XRING O1）——引擎的 native 库与 fastipc 通道跟机型绑定 |
+| root | KernelSU（`ksud` 可用） |
+| Zygisk | **Zygisk Next（`zygisksu`）已启用**——模块要靠它把 `zygisk/arm64-v8a.so` 注入引擎进程 |
+| 引擎 | `com.xiaomi.winplay` 已安装（同款机自带的「PC 引擎」；没有就用完整包，见下） |
+
+### 安装
+
+```bash
+./make-bundle.sh                     # 生成 dist/winplay-pcengine-v1.0.0.zip（84 KB）
+```
+
+把 zip 传到平板，打开 **KernelSU → 模块 → 从本地安装**，选它，重启。
+
+### 刷入过程中它自己做的事
+
+`customize.sh`（安装时，root）：
+
+1. 校验 `com.xiaomi.winplay` 与 `com.xiaomi.gamecenter` 在不在；缺引擎时若模块里有 `apks/winplay.apk` 就装上，否则直接中止并说明原因
+2. `pm install` 本仓库的启动器 `common/WinPlayLauncher.apk`（装不上就留个标记，开机后再补）
+3. 授权：`MANAGE_EXTERNAL_STORAGE`、`REQUEST_INSTALL_PACKAGES`、`POST_NOTIFICATIONS`、读写外部存储
+4. **停用旧模块** `winplay_run` / `winplay_fix`（否则同一个 exe 会被注入两遍）
+
+`service.sh`（每次开机，late_start）：
+
+1. 等 `sys.boot_completed`
+2. `chmod o+x /data/media`（让 uid 7100 能穿越到 raw 目录，FUSE 视图不受影响）
+3. 把 `wintask.exe` / `winfix.exe` 下发到 `prefix/drive_c/windows/`（`chown 7100`）
+4. 首次运行把 `apps.json` 播种到 `/storage/emulated/0/WinPlay/`
+5. 以 root 拉起 **命令网桥** `wp_bridge.sh` 与 **no-Steam 守卫**，并每 30 s 看护一次（死了就重拉）
+
+网桥是这套方案的关键：**App 自己不需要 root 权限**。App 只往 `/storage/emulated/0/wpz/launch_req.txt` 写一行 `seq|screenoff|b64exe|b64args`，root 网桥读到后执行 `wp_launch.sh`（亮屏 → 确保引擎在前台 → 冷启动等待 → 写 `cmd2.txt` → 等 Zygisk 桥回执），结果写回 `launch_res.txt`。
+
+### 为什么 zip 只有 84 KB，不带小米的 APK
+
+`com.xiaomi.winplay` 的 `base.apk` 是 **483 MB**、游戏中心 **56 MB**：
+
+- GitHub 单文件硬上限 100 MB，放不进仓库
+- 这两个是小米的闭源分发包，不适合由本仓库再分发
+
+同款机型刷机时它们本来就在系统里（或用户自己装过一次），所以轻量包只做「校验 + 自动化」。
+
+要在**另一台同款设备离线安装**时，用完整包——它会把 APK 从当前设备 pull 出来打进 zip：
+
+```bash
+./make-bundle.sh --full              # dist/winplay-pcengine-v1.0.0-full.zip（约 560 MB）
+```
+
+模块里的 `apks/` 目录就是给完整包用的：`customize.sh` 发现引擎缺失时优先装它。
+
+### 实测记录（本机）
+
+```
+$ ksud module install /data/local/tmp/wpmod.zip
+- 已检测到 PC 引擎 (com.xiaomi.winplay)
+- 已检测到游戏中心 (com.xiaomi.gamecenter)
+- 启动器已安装
+- 已停用旧模块 winplay_run（重启后生效，可手动删除）
+- Module installed successfully!
+
+$ sh /data/adb/modules_update/winplay_pcengine/service.sh
+[11-19 00:46:06] service start (boot_completed after 0s)
+[11-19 00:46:06] permissions ensured for com.dsh.winplaylauncher
+[11-19 00:46:06] bridge started pid=3252
+
+# 从启动器点 7-Zip（引擎是停的，冷启动）
+t=8s   steam=0  7zip=1  bridge=1     ← 8 秒出窗口，且没有把 Steam 带起来
+```
+
+### 卸载
+
+KernelSU 里删模块即可。`uninstall.sh` 只停网桥与守卫，**不删 Wine prefix、不删你的应用数据**；想连启动器一起删，刷入前在模块目录放一个 `remove_app` 文件。
+
+### 许可
+
+本仓库（含模块脚本、启动器源码、面板工具）以 **GPL-3.0** 发布，见 `LICENSE`。模块本身不含小米的任何二进制；`--full` 打出来的完整包仅供你在自己的设备上自用，不要再分发。

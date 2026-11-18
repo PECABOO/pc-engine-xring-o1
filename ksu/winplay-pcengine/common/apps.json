@@ -1,0 +1,85 @@
+[
+  {
+    "name": "文件管理器 (Explorer++)",
+    "exe": "C:\\windows\\epp.bat",
+    "args": ""
+  },
+  {
+    "name": "7-Zip",
+    "exe": "C:\\apps\\7zip\\7zFM.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "Notepad++ ARM64",
+    "exe": "C:\\apps\\npp-arm64\\notepad++.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "Notepad++ x64",
+    "exe": "C:\\apps\\npp-x64\\notepad++.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "SumatraPDF",
+    "exe": "C:\\apps\\sumatra\\SumatraPDF.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "WinRAR 7.01",
+    "exe": "C:\\Program Files\\WinRAR\\WinRAR.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "VSCode 1.80",
+    "exe": "C:\\apps\\VSCode180\\Code.exe",
+    "args": "--no-sandbox;--force-device-scale-factor=1;--disable-gpu;--disable-gpu-compositing;--disable-features=VizDisplayCompositor",
+    "icon": ""
+  },
+  {
+    "name": "VSCode 1.70",
+    "exe": "C:\\apps\\VSCode170\\Code.exe",
+    "args": "--no-sandbox;--force-device-scale-factor=1;--disable-gpu",
+    "icon": ""
+  },
+  {
+    "name": "putty-x86",
+    "exe": "C:\\apps\\putty-x86\\putty.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "VSCode146",
+    "exe": "C:\\apps\\VSCode146\\Code.exe",
+    "args": "--no-sandbox;--force-device-scale-factor=1;--disable-gpu;--disable-gpu-compositing",
+    "icon": ""
+  },
+  {
+    "name": "obsidian",
+    "exe": "C:\\apps\\obsidian\\Obsidian.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "seven32",
+    "exe": "C:\\apps\\seven32\\7zFM.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "testapp",
+    "exe": "C:\\apps\\testapp\\putty.exe",
+    "args": "",
+    "icon": ""
+  },
+  {
+    "name": "Minecraft 1.20.1",
+    "exe": "C:\\windows\\mc_fab_hi.bat",
+    "args": "",
+    "icon": ""
+  }
+]
