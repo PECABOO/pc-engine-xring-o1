@@ -1,0 +1,17 @@
+[
+  {
+    "name": "7-Zip",
+    "exe": "C:\\apps\\7zip\\7zFM.exe",
+    "args": ""
+  },
+  {
+    "name": "Notepad++ ARM64",
+    "exe": "C:\\apps\\npp-arm64\\notepad++.exe",
+    "args": ""
+  },
+  {
+    "name": "VSCode 1.80",
+    "exe": "C:\\apps\\VSCode180\\Code.exe",
+    "args": "--no-sandbox;--force-device-scale-factor=1;--disable-gpu;--disable-gpu-compositing;--disable-features=VizDisplayCompositor"
+  }
+]

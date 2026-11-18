@@ -1,0 +1,6 @@
+LIBRARY gdi32.dll
+EXPORTS
+CreateFontW
+DeleteObject
+SelectObject
+SetBkMode

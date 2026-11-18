@@ -1,0 +1,13 @@
+LIBRARY kernel32.dll
+EXPORTS
+CreateFileW
+ReadFile
+CloseHandle
+CreateProcessW
+ExitProcess
+GetModuleHandleW
+OpenProcess
+WriteFile
+GetEnvironmentVariableW
+Sleep
+TerminateProcess

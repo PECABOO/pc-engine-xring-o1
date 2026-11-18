@@ -1,0 +1,12 @@
+vlc	https://mirrors.tuna.tsinghua.edu.cn/videolan-ftp/vlc/3.0.21/win64/vlc-3.0.21-win64.zip	vlc-3.0.21/vlc.exe	
+mpchc	https://github.com/clsid2/mpc-hc/releases/download/2.3.5/MPC-HC.2.3.5.x64.zip	mpc-hc64.exe	
+audacity	https://github.com/audacity/audacity/releases/download/Audacity-3.6.4/audacity-win-3.6.4-64bit.zip	Audacity.exe	
+ffmpeg	https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip	bin/ffplay.exe	
+scummvm	https://www.scummvm.org/frs/scummvm/2.8.1/scummvm-2.8.1-win32-x86_64.zip	scummvm.exe	
+nodejs	https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.11.1/node-v20.11.1-win-x64.zip	node.exe	
+python-embed	https://mirrors.huaweicloud.com/python/3.12.4/python-3.12.4-embed-amd64.zip	python.exe	
+gitportable	https://github.com/git-for-windows/git/releases/download/v2.46.0.windows.1/PortableGit-2.46.0-64-bit.7z.exe	cmd/git.exe	
+everything	https://www.voidtools.com/Everything-1.4.1.1026.x64.zip	Everything.exe	
+cpuz	https://download.cpuid.com/cpu-z/cpu-z_2.10-en.zip	cpuz_x64.exe	
+faststone	https://www.faststonesoft.net/DN/FSViewerSetup74.exe	FSViewer.exe	
+xnviewmp	https://download.xnview.com/XnViewMP-win-x64.exe	xnviewmp.exe	

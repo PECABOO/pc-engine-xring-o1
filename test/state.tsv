@@ -1,0 +1,12 @@
+audacity	render	1	0	shot=4c6b7925->ede74a85
+cpuz	render	1	0	shot=4c6b7925->1d85101f
+everything	render	1	0	shot=4c6b7925->33c850df
+faststone	render	1	0	shot=c9eef063->716c4fb4
+ffmpeg	no-exe	-	-	-
+gitportable	render	1	1	shot=n/a (console: git 2.46.0 + node v20.11.1 输出已写入 git_ver.txt 验证)
+mpchc	render	4	0	shot=ec4bcd7a->3ce46dce (MPC-HC 2.3.5 x64)
+nodejs	render	1	0	shot=c9eef063->02c18e4c
+python-embed	render	1	0	shot=c9eef063->59b207b1
+scummvm	render	1	0	shot=4c6b7925->401df7f0
+vlc	render	1	0	shot=381ef1ea->5eac33b0
+xnviewmp	no-exe	-	-	-

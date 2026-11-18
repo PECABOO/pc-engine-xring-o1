@@ -1,0 +1,28 @@
+# 大件二进制（都可用脚本重新下载/生成，且超过 GitHub 单文件 100MB 限制）
+mc/
+*.zip
+*.tar
+*.7z
+*.msi
+*.exe
+
+# 构建中间产物
+launcher/build/
+launcher/assets/
+**/*.o
+*.idsig
+*.apk.idsig
+
+# 运行时日志与抓屏原始数据
+*.log
+*.raw
+
+# 本机签名密钥（自签名调试证书，不入库）
+*.jks
+*.keystore
+
+# 与本项目无关的宿主侧工具脚本（DSH 自身补丁），不入公开仓库
+scripts/fix-image-offload-null-guard.sh
+
+# 运行时产物
+*.pid
