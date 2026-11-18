@@ -1508,7 +1508,7 @@ if(same) return 1;   /* 自己的窗口一律不碰 */
 ### 安装
 
 ```bash
-./make-bundle.sh                     # 生成 dist/winplay-pcengine-v1.0.2.zip（84 KB）
+./make-bundle.sh                     # 生成 dist/winplay-pcengine-v1.0.3.zip（84 KB）
 ```
 
 把 zip 传到平板，打开 **KernelSU → 模块 → 从本地安装**，选它，重启。
@@ -1544,7 +1544,7 @@ if(same) return 1;   /* 自己的窗口一律不碰 */
 要在**另一台同款设备离线安装**时，用完整包——它会把 APK 从当前设备 pull 出来打进 zip：
 
 ```bash
-./make-bundle.sh --full              # dist/winplay-pcengine-v1.0.2-full.zip（约 560 MB）
+./make-bundle.sh --full              # dist/winplay-pcengine-v1.0.3-full.zip（约 560 MB）
 ```
 
 模块里的 `apks/` 目录就是给完整包用的：`customize.sh` 发现引擎缺失时优先装它。
@@ -1575,3 +1575,8 @@ KernelSU 里删模块即可。`uninstall.sh` 只停网桥与守卫，**不删 Wi
 ### 许可
 
 本仓库（含模块脚本、启动器源码、面板工具）以 **GPL-3.0** 发布，见 `LICENSE`。模块本身不含小米的任何二进制；`--full` 打出来的完整包仅供你在自己的设备上自用，不要再分发。
+
+### 两个容易误判的实测细节（2026-11-19）
+
+1. **7-Zip 的窗口标题只有路径**：`7zFM.exe` 打开 `C:\users\xiaomi\` 时，标题栏就是 `C:\users\xiaomi\`，不含 "7-Zip" 字样；`wintask` 面板里因此显示成 `[W] C:\users\xiaomi\`，容易被误认为「文件管理器」或「窗口没出来」。判断窗口属于哪个进程，看 `/proc/<pid>/fd` 里有没有 `dmabuf:VRI[WineActivity]` 即可（`7zFM.exe` 有 `VRI[WineActivity]#7`）。
+2. **`input tap` 用的是逻辑坐标 1600×1068**（不是物理 3200×2136）：脚本里若按截图物理像素点击会整体偏大约 2 倍。实测 `input tap 38 392` 命中面板 `<<`、`input tap 114 352` 命中列表首行。

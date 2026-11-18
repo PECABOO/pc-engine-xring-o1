@@ -59,6 +59,9 @@ static int cb(void* h, long long lp){
         SetWindowPos(h,0,0,0,0,0,0x0027 /*NOSIZE|NOMOVE|NOZORDER|FRAMECHANGED*/);
         st = GetWindowLongW(h, -16);
     }
+    /* 最小化时窗口被挪到 (-32000,-32000)：不是「跑出屏幕」，不要夹回来，
+       否则屏幕上会出现一个 160x63 的幽灵小窗，还会和系统的还原动作打架 */
+    if(x<=-30000 || y<=-30000) { wr(L"   [minimized, skip]\r\n"); g_n++; return 1; }
     int bad = (x<0)||(y<0)||(x+w>g_dw)||(y+hh>g_dh);
     wr(L"st="); wrn(st); wr(L"  "); wrn(x); wr(L","); wrn(y); wr(L","); wrn(w); wr(L","); wrn(hh); wr(L"  "); wr(t);
     if(bad){
