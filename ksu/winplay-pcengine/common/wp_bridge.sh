@@ -20,6 +20,30 @@ IRES=$WPZ/install_res.txt
 
 trap '' HUP INT TERM          # 不随 adb shell 退出/挂断而死
 
+# ---- 单实例锁：service.sh、启动器、手动启动都可能拉起它，只允许一份 ----
+# mkdir 是原子的：并发时只有一个能成功，其余立刻退出（不能用 mkdir -p，它对已存在目录不报错）
+LOCK=/data/local/tmp/.wp_bridge.lock
+if mkdir "$LOCK" 2>/dev/null; then
+    echo $$ > "$LOCK/pid"
+elif [ -n "$(cat "$LOCK/pid" 2>/dev/null)" ] && kill -0 "$(cat "$LOCK/pid" 2>/dev/null)" 2>/dev/null; then
+    echo "[$(date)] bridge already running pid=$(cat "$LOCK/pid" 2>/dev/null), this one exits" >> /storage/emulated/0/wpz/bridge.log
+    exit 0
+else
+    rm -rf "$LOCK"                       # 上次异常退出留下的死锁
+    mkdir "$LOCK" 2>/dev/null || exit 0
+    echo $$ > "$LOCK/pid"
+fi
+trap 'rm -rf "$LOCK"' EXIT INT TERM HUP
+
+# 锁文件可能因强杀而残留：再做一次「最小 PID 胜出」的兜底判定
+# （toybox ps 的 ARGS 列可能截断，所以只按 PID 比较，不看命令行尾部）
+OLDER=$(ps -A -o PID,ARGS 2>/dev/null | awk -v me=$$ '/wp_bridge\.sh/ && $1+0 < me+0 {print $1; exit}')
+if [ -n "$OLDER" ]; then
+    echo "[$(date)] bridge older instance pid=$OLDER exists, this one ($$) exits" >> /storage/emulated/0/wpz/bridge.log
+    exit 0
+fi
+
+
 # ---- no-Steam 守卫（flag 存在时把引擎自己拉起的 steam 杀掉）----
 NS=$(dirname "$0")/wp_nosteam.sh
 [ -f "$NS" ] || NS=/data/local/tmp/wp/wp_nosteam.sh

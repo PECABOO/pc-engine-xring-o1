@@ -1,6 +1,6 @@
 id=winplay_pcengine
 name=WinPlay PC Engine (XRING O1)
-version=v1.0.0
-versionCode=10000
+version=v1.0.1
+versionCode=10001
 author=PECABOO
 description=在 Xiaomi Pad 7 Ultra (XRING O1) 上一键跑 Windows 程序：Zygisk 桥 + 启动器 + root 网桥 + sdcard 挂载 + Wine 任务面板。开机自动就绪，应用无需 root 权限。

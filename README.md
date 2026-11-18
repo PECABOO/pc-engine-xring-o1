@@ -1508,7 +1508,7 @@ if(same) return 1;   /* 自己的窗口一律不碰 */
 ### 安装
 
 ```bash
-./make-bundle.sh                     # 生成 dist/winplay-pcengine-v1.0.0.zip（84 KB）
+./make-bundle.sh                     # 生成 dist/winplay-pcengine-v1.0.1.zip（84 KB）
 ```
 
 把 zip 传到平板，打开 **KernelSU → 模块 → 从本地安装**，选它，重启。
@@ -1544,7 +1544,7 @@ if(same) return 1;   /* 自己的窗口一律不碰 */
 要在**另一台同款设备离线安装**时，用完整包——它会把 APK 从当前设备 pull 出来打进 zip：
 
 ```bash
-./make-bundle.sh --full              # dist/winplay-pcengine-v1.0.0-full.zip（约 560 MB）
+./make-bundle.sh --full              # dist/winplay-pcengine-v1.0.1-full.zip（约 560 MB）
 ```
 
 模块里的 `apks/` 目录就是给完整包用的：`customize.sh` 发现引擎缺失时优先装它。
